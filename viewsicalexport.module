@@ -1,0 +1,41 @@
+<?php
+
+/**
+ * @file
+ * Adds ical functionality to Views.
+ */
+
+/**
+ * Implements hook_autoload_info().
+ */
+function viewsicalexport_autoload_info() {
+  return array(
+    'viewsicalexport_plugin_row_ical_fields' => 'views/viewsicalexport_plugin_row_ical_fields.inc',
+    'viewsicalexport_plugin_style_ical_feed' => 'views/viewsicalexport_plugin_style_ical_feed.inc',
+  );
+}
+
+/**
+ * Implements hook_hook_info().
+ */
+function viewsicalexport_hook_info() {
+  $hooks = array(
+    'viewsicalexport_export_html_alter',
+    'viewsicalexport_export_raw_event_alter',
+    'viewsicalexport_export_vevent_alter',
+    'viewsicalexport_export_vcalendar_alter',
+    'viewsicalexport_export_post_render_alter',
+  );
+
+  return array_fill_keys($hooks, array('group' => 'viewsicalexport'));
+}
+
+/**
+ * Implements hook_views_api().
+ */
+function viewsicalexport_views_api() {
+  return array(
+    'api' => 3,
+    'path' => backdrop_get_path('module', 'viewsicalexport') . '/views',
+  );
+}
