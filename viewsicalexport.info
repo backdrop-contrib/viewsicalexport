@@ -1,0 +1,8 @@
+name = Views iCal export
+description = Enables export of iCal feeds using Views.
+package = Date/Time
+backdrop = 1.x
+type = module
+
+dependencies[] = views
+dependencies[] = date
