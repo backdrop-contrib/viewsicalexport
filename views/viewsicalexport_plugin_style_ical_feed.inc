@@ -1,4 +1,5 @@
 <?php
+
 /**
  * @file
  * Views style plugin for the Date iCal module.
@@ -125,8 +126,8 @@ class viewsicalexport_plugin_style_ical_feed extends views_plugin_style {
    * Render the event arrays returned by the row plugin into a VCALENDAR.
    */
   public function render() {
-    if (empty($this->row_plugin) || !in_array($this->row_plugin->plugin_name, array('viewsicalexport', 'viewsicalexport_fields'))) {
-      debug('viewsicalexport_plugin_style_ical_feed: This style plugin supports only the "iCal Fields" row plugins.', NULL, TRUE);
+    if (empty($this->row_plugin) || $this->row_plugin->plugin_name !== 'viewsicalexport_fields') {
+      debug('viewsicalexport_plugin_style_ical_feed: This style plugin supports only the "iCal Fields" row plugin.', NULL, TRUE);
       return t('To enable iCal output, the view Format must be configured to Show: iCal Fields.');
     }
     if ($this->row_plugin->plugin_name == 'viewsicalexport_fields' && empty($this->row_plugin->options['date_field'])) {
@@ -186,27 +187,24 @@ class viewsicalexport_plugin_style_ical_feed extends views_plugin_style {
       if (!$this->_get_option('exclude_dtstamp')) {
         $vevent[] = 'DTSTAMP:' . $dtstamp;
       }
-      $vevent[] = 'SUMMARY:' . $event['summary'];// FIXME sanitize/escape
+      $vevent[] = 'SUMMARY:' . $event['summary'];
 
       if ($event['all_day']) {
         // All Day events need to be DATEs, rather than DATE-TIMEs.
-        //$vevent->setDtstart($start['year'], $start['month'], $start['day'],
-        //  FALSE, FALSE, FALSE, FALSE, array('VALUE' => 'DATE'));
-        // date cardinality?
+        $vevent[] = 'DTSTART;VALUE=DATE:' . viewsicalexport_ical_utc($event['start'], TRUE);
       }
       else {
-        $vevent[] = 'DTSTART:' . viewsicalexport_icalUTC($event['start']);
+        $vevent[] = 'DTSTART:' . viewsicalexport_ical_utc($event['start']);
       }
 
       // Only add the end date if there is one.
       if (!empty($event['end'])) {
         if ($event['all_day']) {
-          //$vevent->setDtend($end['year'], $end['month'], $end['day'],
-          //  FALSE, FALSE, FALSE, FALSE, array('VALUE' => 'DATE'));
-          // use date cardinality here?
+          // FIXME can dtend be omitted in this case?
+          $vevent[] = 'DTEND;VALUE=DATE:' . viewsicalexport_ical_utc($event['end'], TRUE);
         }
         else {
-          $vevent[] = 'DTEND:' . viewsicalexport_icalUTC($event['end']);
+          $vevent[] = 'DTEND:' . viewsicalexport_ical_utc($event['end']);
         }
       }
       if (!empty($event['location'])) {
@@ -216,10 +214,10 @@ class viewsicalexport_plugin_style_ical_feed extends views_plugin_style {
         $vevent[] = 'DESCRIPTION:' . $event['description'];
       }
       if (!empty($event['last-modified'])) {
-        $vevent[] = 'LAST-MODIFIED:' . viewsicalexport_icalUTC($event['last-modified']);
+        $vevent[] = 'LAST-MODIFIED:' . viewsicalexport_ical_utc($event['last-modified']);
       }
       if (!empty($event['created'])) {
-        $vevent[] = 'CREATED:' . viewsicalexport_icalUTC($event['created']);
+        $vevent[] = 'CREATED:' . viewsicalexport_ical_utc($event['created']);
       }
       $vevent[] = 'END:VEVENT';
 
@@ -260,4 +258,5 @@ class viewsicalexport_plugin_style_ical_feed extends views_plugin_style {
 
     return $output;
   }
+
 }

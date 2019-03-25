@@ -45,9 +45,16 @@ function viewsicalexport_views_api() {
  *
  * @param object $date
  *   BackdropDateTime object.
+ * @param bool $date_only
+ *   Whether cardinality should be full or date only.
  */
-function viewsicalexport_icalUTC($date) {
+function viewsicalexport_ical_utc($date, $date_only = FALSE) {
   // FIXME is originalTime always set?
+  if ($date_only) {
+    $date->granularity = array('year', 'month', 'day');
+    $utc = format_date($date->originalTime, 'custom', 'Ymd', 'UTC');
+    return $utc;
+  }
   $date->granularity = array('year', 'month', 'day', 'hour', 'minute', 'second');
   $utc = format_date($date->originalTime, 'custom', 'Ymd\THis\Z', 'UTC');
   return $utc;
