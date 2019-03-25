@@ -8,7 +8,7 @@
 /**
  * Defines a Views style plugin that renders iCal feeds.
  */
-class viewsicalexport_plugin_style_ical_feed extends views_plugin_style {
+class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
 
   /**
    * Internal helper function.
@@ -127,7 +127,7 @@ class viewsicalexport_plugin_style_ical_feed extends views_plugin_style {
    */
   public function render() {
     if (empty($this->row_plugin) || $this->row_plugin->plugin_name !== 'viewsicalexport_fields') {
-      debug('viewsicalexport_plugin_style_ical_feed: This style plugin supports only the "iCal Fields" row plugin.', NULL, TRUE);
+      debug('ViewsicalexportPluginStyleIcalFeed: This style plugin supports only the "iCal Fields" row plugin.', NULL, TRUE);
       return t('To enable iCal output, the view Format must be configured to Show: iCal Fields.');
     }
     if ($this->row_plugin->plugin_name == 'viewsicalexport_fields' && empty($this->row_plugin->options['date_field'])) {

@@ -1,14 +1,14 @@
 <?php
+
 /**
  * @file
- * Defines the iCal Fields row style plugin, which lets users map view fields
- * to the components of the VEVENTs in the iCal feed.
+ * Defines the iCal Fields row style plugin.
  */
 
 /**
  * A Views plugin which builds an iCal VEVENT from a views row with Fields.
  */
-class viewsicalexport_plugin_row_ical_fields extends views_plugin_row {
+class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
 
   /**
    * Set up the options for the row plugin.
@@ -254,7 +254,7 @@ class viewsicalexport_plugin_row_ical_fields extends views_plugin_row {
    */
   protected function get_row_date($row, $date_field_name) {
     $start = NULL;
-    $end   = NULL;
+    $end = NULL;
     $rrule = NULL;
     $delta = 0;
     $is_date_field = FALSE;
@@ -359,7 +359,7 @@ class viewsicalexport_plugin_row_ical_fields extends views_plugin_row {
    * Retrieves a field value from the style plugin.
    *
    * @param int $index
-   *   The index count of the row
+   *   The index count of the row.
    * @param string $field_id
    *   The ID assigned to the required field in the display.
    *
@@ -371,4 +371,5 @@ class viewsicalexport_plugin_row_ical_fields extends views_plugin_row {
     }
     return $this->view->style_plugin->get_field($index, $field_id);
   }
+
 }
