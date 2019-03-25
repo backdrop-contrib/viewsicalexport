@@ -150,16 +150,18 @@ class viewsicalexport_plugin_style_ical_feed extends views_plugin_style {
     unset($this->view->row_index);
 
     // Try to load the iCalcreator library.
-    $library = libraries_load('iCalcreator');
-    if (!$library['loaded']) {
+    //$library = libraries_load('iCalcreator');
+    if (1 === 2) {
       // The iCalcreator library isn't available, so we can't output anything.
       $output = t('Please install the iCalcreator library to enable iCal output.');
     }
     else {
-      // Create a vcalendar object using the iCalcreator library.
-      $config = array('unique_id' => 'Date iCal');
-      $vcalendar = new vcalendar($config);
-      $vcalendar->setMethod('PUBLISH');
+      $vcalendar = array();
+      $vcalendar[] = 'BEGIN:VCALENDAR';
+      $vcalendar[] = 'VERSION:2.0';
+      $vcalendar[] = 'PRODID:-//Backdrop Views Ical Export';
+      $vcalendar[] = 'METHOD:PUBLISH';
+      $vcalendar[] = 'CALSCALE:GREGORIAN';
 
       // Only include the X-WR-CALNAME property if the user didn't enable
       // the "Exclude Calendar Name" option.
@@ -172,13 +174,13 @@ class viewsicalexport_plugin_style_ical_feed extends views_plugin_style {
           }
         }
         if (!empty($cal_name)) {
-          $vcalendar->setProperty('X-WR-CALNAME', $cal_name, array('VALUE' => 'TEXT'));
+          $vcalendar[] = 'X-WR-CALNAME;VALUE=TEXT:' . $cal_name;
         }
       }
 
       // Now add the VEVENTs.
-      $timezones = array();
       foreach ($events as $event) {
+        $vevent = array();
         if (empty($event)) {
           // The row plugin returned NULL for this row, which can happen due to
           // either various error conditions, or because an RRULE is involved.
@@ -186,108 +188,60 @@ class viewsicalexport_plugin_style_ical_feed extends views_plugin_style {
           continue;
         }
 
-        $vevent = $vcalendar->newComponent('vevent');
-        $vevent->setUid($event['uid']);
-        $vevent->setSummary($event['summary']);
+        $vevent[] = 'BEGIN:VEVENT';
+        $vevent[] = 'UID:' . $event['uid'];
+        $vevent[] = 'SUMMARY:' . $event['summary'];// FIXME sanitize/escape
 
         // Get the start date as an array.
-        $start = $event['start']->toArray();
-        $start_timezone = $event['start']->getTimezone()->getName();
-        $timezones[$start_timezone] = $start_timezone;
+        $start = viewsicalexport_icalUTC($event['start']);
 
         if ($event['all_day']) {
           // All Day events need to be DATEs, rather than DATE-TIMEs.
-          $vevent->setDtstart($start['year'], $start['month'], $start['day'],
-            FALSE, FALSE, FALSE, FALSE, array('VALUE' => 'DATE'));
+          //$vevent->setDtstart($start['year'], $start['month'], $start['day'],
+          //  FALSE, FALSE, FALSE, FALSE, array('VALUE' => 'DATE'));
+          // date cardinality
         }
         else {
-          $vevent->setDtstart(
-            $start['year'],
-            $start['month'],
-            $start['day'],
-            $start['hour'],
-            $start['minute'],
-            $start['second'],
-            $start_timezone
-          );
+          $vevent[] = 'DTSTART:' . '20190325T125138Z';
         }
-
-        // Add the Timezone info to the start date, for use later.
-        $start['tz'] = $event['start']->getTimezone();
 
         // Only add the end date if there is one.
         if (!empty($event['end'])) {
-          $end = $event['end']->toArray();
-          $end_timezone = $event['end']->getTimezone()->getName();
-          $timezones[$end_timezone] = $end_timezone;
+          $end = viewsicalexport_icalUTC($event['end']);
 
           if ($event['all_day']) {
-            $vevent->setDtend($end['year'], $end['month'], $end['day'],
-              FALSE, FALSE, FALSE, FALSE, array('VALUE' => 'DATE'));
+            //$vevent->setDtend($end['year'], $end['month'], $end['day'],
+            //  FALSE, FALSE, FALSE, FALSE, array('VALUE' => 'DATE'));
+            // use date cardinality here
           }
           else {
-            $vevent->setDtend(
-              $end['year'],
-              $end['month'],
-              $end['day'],
-              $end['hour'],
-              $end['minute'],
-              $end['second'],
-              $end_timezone
-            );
+            $vevent[] = 'DTEND:' . '20190325T135138Z';
           }
-          $end['tz'] = $event['end']->getTimezone();
-        }
-
-        if (!empty($event['url'])) {
-          $vevent->setUrl($event['url'], array('type' => 'URI'));
         }
         if (!empty($event['location'])) {
-          $vevent->setLocation($event['location']);
+          $vevent[] = 'LOCATION:' . $event['location'];
         }
         if (!empty($event['description'])) {
-          $vevent->setDescription($event['description']);
+          $vevent[] = 'DESCRIPTION:' . $event['description'];// FIXME
         }
         if (!empty($event['last-modified'])) {
-          $lm = $event['last-modified']->toArray();
-          $vevent->setLastModified(
-            $lm['year'],
-            $lm['month'],
-            $lm['day'],
-            $lm['hour'],
-            $lm['minute'],
-            $lm['second'],
-            $lm['timezone']
-          );
+          $vevent[] = 'LAST-MODIFIED:' . '20190325T125138Z';
         }
         if (!empty($event['created'])) {
-          $created = $event['created']->toArray();
-          $vevent->setCreated(
-            $created['year'],
-            $created['month'],
-            $created['day'],
-            $created['hour'],
-            $created['minute'],
-            $created['second'],
-            $created['timezone']
-          );
+          $vevent[] = 'CREATED:' . '20190325T125138Z';
         }
+        $vevent[] = 'END:VEVENT';
 
         // Allow other modules to alter the vevent before it's exported.
         backdrop_alter('viewsicalexport_export_vevent', $vevent, $this->view, $event);
+        $vcalendar[] = implode("\r\n", $vevent);
       }
 
-      // Now add to the calendar all the timezones used by the events.
-      foreach ($timezones as $timezone) {
-        if (strtoupper($timezone) != 'UTC') {
-          iCalUtilityFunctions::createTimezone($vcalendar, $timezone);
-        }
-      }
-
+      $vcalendar[] = 'END:VCALENDAR';
       // Allow other modules to alter the vcalendar before it's exported.
       backdrop_alter('viewsicalexport_export_vcalendar', $vcalendar, $this->view);
+      $output = implode("\r\n", $vcalendar);
 
-      $output = $vcalendar->createCalendar();
       // iCalcreator escapes all commas and semicolons in string values, as the
       // spec demands. However, some calendar clients are buggy and fail to
       // unescape these characters. Users may choose to unescape them here to

@@ -192,7 +192,7 @@ class viewsicalexport_plugin_row_ical_fields extends views_plugin_row {
     $entity_id = $row->{$this->view->base_field};
     global $base_url;
     $domain = preg_replace('#^https?://#', '', $base_url);
-    $event['uid'] = "calendar.$entity_id.$date_field_name.$date_field_delta@$domain";
+    $event['uid'] = "events.$entity_id.$date_field_name.$date_field_delta@$domain";
 
     // Because of the way that Date implements repeating dates, we're going to
     // be given a separate view result for each repeat. We only want to

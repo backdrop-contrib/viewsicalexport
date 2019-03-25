@@ -39,3 +39,37 @@ function viewsicalexport_views_api() {
     'path' => backdrop_get_path('module', 'viewsicalexport') . '/views',
   );
 }
+
+/**
+ * Custom helper function to convert dates.
+ */
+function viewsicalexport_icalUTC($date) {
+  return '20190428T093000T';
+}
+
+/**
+ * Custom helper to sanitize text fields.
+ */
+function viewsicalexport_sanitize_text($text) {
+  $text = decode_entities($text);
+  $text = strip_tags($text);
+  return trim($text);
+}
+
+/**
+ * FIXME remove these...?
+ */
+/**
+ * Exception class for generic exceptions thrown by this module.
+ */
+class DateIcalException extends Exception {}
+
+/**
+ * Exception used by iCal Fields for when a date field is blank.
+ */
+class BlankDateFieldException extends DateIcalException {}
+
+/**
+ * Exception thrown when the Feeds parser plugin fails.
+ */
+class DateIcalParseException extends DateIcalException {}
