@@ -226,9 +226,13 @@ class viewsicalexport_plugin_row_ical_fields extends views_plugin_row {
     backdrop_alter('viewsicalexport_export_html', $text_fields, $this->view, $context);
 
     // Sanitize the text fields for iCal compliance, and add them to the event.
-    $event['summary'] = viewsicalexport_sanitize_text($text_fields['summary']);
-    $event['location'] = viewsicalexport_sanitize_text($text_fields['location']);
-    $event['description'] = viewsicalexport_sanitize_text($text_fields['description']);
+    $escape = TRUE;
+    if ($this->options['unescape_punctuation']) {
+      $escape = FALSE;
+    }
+    $event['summary'] = viewsicalexport_sanitize_text($text_fields['summary'], $escape);
+    $event['location'] = viewsicalexport_sanitize_text($text_fields['location'], $escape);
+    $event['description'] = viewsicalexport_sanitize_text($text_fields['description'], $escape);
 
     // Allow other modules to alter the event object before it gets passed to
     // the style plugin to be converted into an iCal VEVENT.

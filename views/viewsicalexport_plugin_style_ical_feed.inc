@@ -149,126 +149,91 @@ class viewsicalexport_plugin_style_ical_feed extends views_plugin_style {
     }
     unset($this->view->row_index);
 
-    // Try to load the iCalcreator library.
-    //$library = libraries_load('iCalcreator');
-    if (1 === 2) {
-      // The iCalcreator library isn't available, so we can't output anything.
-      $output = t('Please install the iCalcreator library to enable iCal output.');
-    }
-    else {
-      $vcalendar = array();
-      $vcalendar[] = 'BEGIN:VCALENDAR';
-      $vcalendar[] = 'VERSION:2.0';
-      $vcalendar[] = 'PRODID:-//Backdrop Views Ical Export';
-      $vcalendar[] = 'METHOD:PUBLISH';
-      $vcalendar[] = 'CALSCALE:GREGORIAN';
+    $vcalendar = array();
+    $dtstamp = format_date(REQUEST_TIME, 'custom', 'Ymd\THis\Z', 'UTC');
+    $vcalendar[] = 'BEGIN:VCALENDAR';
+    $vcalendar[] = 'VERSION:2.0';
+    $vcalendar[] = 'PRODID:-//Backdrop Views Ical Export';
+    $vcalendar[] = 'METHOD:PUBLISH';
 
-      // Only include the X-WR-CALNAME property if the user didn't enable
-      // the "Exclude Calendar Name" option.
-      if (!$this->_get_option('no_calname')) {
-        $cal_name = $this->_get_option('cal_name');
+    // Only include the X-WR-CALNAME property if the user didn't enable
+    // the "Exclude Calendar Name" option.
+    if (!$this->_get_option('no_calname')) {
+      $cal_name = $this->_get_option('cal_name');
+      if (empty($cal_name)) {
+        $cal_name = $this->view->get_title();
         if (empty($cal_name)) {
-          $cal_name = $this->view->get_title();
-          if (empty($cal_name)) {
-            $cal_name = config_get('system.core', 'site_name');
-          }
-        }
-        if (!empty($cal_name)) {
-          $vcalendar[] = 'X-WR-CALNAME;VALUE=TEXT:' . $cal_name;
+          $cal_name = config_get('system.core', 'site_name');
         }
       }
+      if (!empty($cal_name)) {
+        $vcalendar[] = 'X-WR-CALNAME;VALUE=TEXT:' . $cal_name;
+      }
+    }
 
-      // Now add the VEVENTs.
-      foreach ($events as $event) {
-        $vevent = array();
-        if (empty($event)) {
-          // The row plugin returned NULL for this row, which can happen due to
-          // either various error conditions, or because an RRULE is involved.
-          // When this happens, just skip it.
-          continue;
-        }
+    // Now add the VEVENTs.
+    foreach ($events as $event) {
+      $vevent = array();
+      if (empty($event)) {
+        // The row plugin returned NULL for this row, which can happen due to
+        // either various error conditions, or because an RRULE is involved.
+        // When this happens, just skip it.
+        continue;
+      }
 
-        $vevent[] = 'BEGIN:VEVENT';
-        $vevent[] = 'UID:' . $event['uid'];
-        $vevent[] = 'SUMMARY:' . $event['summary'];// FIXME sanitize/escape
+      $vevent[] = 'BEGIN:VEVENT';
+      $vevent[] = 'UID:' . $event['uid'];
+      if (!$this->_get_option('exclude_dtstamp')) {
+        $vevent[] = 'DTSTAMP:' . $dtstamp;
+      }
+      $vevent[] = 'SUMMARY:' . $event['summary'];// FIXME sanitize/escape
 
-        // Get the start date as an array.
-        $start = viewsicalexport_icalUTC($event['start']);
+      if ($event['all_day']) {
+        // All Day events need to be DATEs, rather than DATE-TIMEs.
+        //$vevent->setDtstart($start['year'], $start['month'], $start['day'],
+        //  FALSE, FALSE, FALSE, FALSE, array('VALUE' => 'DATE'));
+        // date cardinality?
+      }
+      else {
+        $vevent[] = 'DTSTART:' . viewsicalexport_icalUTC($event['start']);
+      }
 
+      // Only add the end date if there is one.
+      if (!empty($event['end'])) {
         if ($event['all_day']) {
-          // All Day events need to be DATEs, rather than DATE-TIMEs.
-          //$vevent->setDtstart($start['year'], $start['month'], $start['day'],
+          //$vevent->setDtend($end['year'], $end['month'], $end['day'],
           //  FALSE, FALSE, FALSE, FALSE, array('VALUE' => 'DATE'));
-          // date cardinality
+          // use date cardinality here?
         }
         else {
-          $vevent[] = 'DTSTART:' . '20190325T125138Z';
+          $vevent[] = 'DTEND:' . viewsicalexport_icalUTC($event['end']);
         }
-
-        // Only add the end date if there is one.
-        if (!empty($event['end'])) {
-          $end = viewsicalexport_icalUTC($event['end']);
-
-          if ($event['all_day']) {
-            //$vevent->setDtend($end['year'], $end['month'], $end['day'],
-            //  FALSE, FALSE, FALSE, FALSE, array('VALUE' => 'DATE'));
-            // use date cardinality here
-          }
-          else {
-            $vevent[] = 'DTEND:' . '20190325T135138Z';
-          }
-        }
-        if (!empty($event['location'])) {
-          $vevent[] = 'LOCATION:' . $event['location'];
-        }
-        if (!empty($event['description'])) {
-          $vevent[] = 'DESCRIPTION:' . $event['description'];// FIXME
-        }
-        if (!empty($event['last-modified'])) {
-          $vevent[] = 'LAST-MODIFIED:' . '20190325T125138Z';
-        }
-        if (!empty($event['created'])) {
-          $vevent[] = 'CREATED:' . '20190325T125138Z';
-        }
-        $vevent[] = 'END:VEVENT';
-
-        // Allow other modules to alter the vevent before it's exported.
-        backdrop_alter('viewsicalexport_export_vevent', $vevent, $this->view, $event);
-        $vcalendar[] = implode("\r\n", $vevent);
       }
-
-      $vcalendar[] = 'END:VCALENDAR';
-      // Allow other modules to alter the vcalendar before it's exported.
-      backdrop_alter('viewsicalexport_export_vcalendar', $vcalendar, $this->view);
-      $output = implode("\r\n", $vcalendar);
-
-      // iCalcreator escapes all commas and semicolons in string values, as the
-      // spec demands. However, some calendar clients are buggy and fail to
-      // unescape these characters. Users may choose to unescape them here to
-      // sidestep those clients' bugs.
-      // NOTE: This results in a non-compliant iCal feed, but it seems like a
-      // LOT of major clients are bugged this way.
-      if ($this->_get_option('unescape_punctuation')) {
-        $output = str_replace('\,', ',', $output);
-        $output = str_replace('\;', ';', $output);
+      if (!empty($event['location'])) {
+        $vevent[] = 'LOCATION:' . $event['location'];
       }
-
-      // In order to respect the Exclude DTSTAMP option, we unfortunately have
-      // to parse out the DTSTAMP properties after they get rendered. Simply
-      // using deleteProperty('DTSTAMP') doesn't work, because iCalcreator
-      // considers the DTSTAMP to be essential, and will re-create it when
-      // createCalendar() is called.
-      if ($this->_get_option('exclude_dtstamp')) {
-        $filtered_lines = array();
-        foreach (explode("\r\n", $output) as $line) {
-          if (strpos($line, 'DTSTAMP') === 0) {
-            continue;
-          }
-          $filtered_lines[] = $line;
-        }
-        $output = implode("\r\n", $filtered_lines);
+      if (!empty($event['description'])) {
+        $vevent[] = 'DESCRIPTION:' . $event['description'];
       }
+      if (!empty($event['last-modified'])) {
+        $vevent[] = 'LAST-MODIFIED:' . viewsicalexport_icalUTC($event['last-modified']);
+      }
+      if (!empty($event['created'])) {
+        $vevent[] = 'CREATED:' . viewsicalexport_icalUTC($event['created']);
+      }
+      $vevent[] = 'END:VEVENT';
+
+      // Allow other modules to alter the vevent before it's exported.
+      backdrop_alter('viewsicalexport_export_vevent', $vevent, $this->view, $event);
+      $vcalendar[] = implode("\r\n", $vevent);
     }
+
+    $vcalendar[] = 'END:VCALENDAR';
+
+    // Allow other modules to alter the vcalendar before it's exported.
+    backdrop_alter('viewsicalexport_export_vcalendar', $vcalendar, $this->view);
+    $output = implode("\r\n", $vcalendar);
+    $output = wordwrap($output, 75, "\r\n");
 
     // These steps shouldn't be run during Preview on the View page.
     if (empty($this->view->live_preview)) {

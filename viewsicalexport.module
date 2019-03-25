@@ -42,17 +42,26 @@ function viewsicalexport_views_api() {
 
 /**
  * Custom helper function to convert dates.
+ *
+ * @param object $date
+ *   BackdropDateTime object.
  */
 function viewsicalexport_icalUTC($date) {
-  return '20190428T093000T';
+  // FIXME is originalTime always set?
+  $date->granularity = array('year', 'month', 'day', 'hour', 'minute', 'second');
+  $utc = format_date($date->originalTime, 'custom', 'Ymd\THis\Z', 'UTC');
+  return $utc;
 }
 
 /**
  * Custom helper to sanitize text fields.
  */
-function viewsicalexport_sanitize_text($text) {
+function viewsicalexport_sanitize_text($text, $escape = TRUE) {
   $text = decode_entities($text);
   $text = strip_tags($text);
+  if ($escape) {
+    $text = addcslashes($text, ',;');
+  }
   return trim($text);
 }
 
