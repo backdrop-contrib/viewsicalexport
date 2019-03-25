@@ -49,14 +49,13 @@ function viewsicalexport_views_api() {
  *   Whether cardinality should be full or date only.
  */
 function viewsicalexport_ical_utc($date, $date_only = FALSE) {
-  // FIXME is originalTime always set?
+  $stamp = $date->format('U');
   if ($date_only) {
-    $date->granularity = array('year', 'month', 'day');
-    $utc = format_date($date->originalTime, 'custom', 'Ymd', 'UTC');
-    return $utc;
+    $utc = format_date($stamp, 'custom', 'Ymd', 'UTC');
   }
-  $date->granularity = array('year', 'month', 'day', 'hour', 'minute', 'second');
-  $utc = format_date($date->originalTime, 'custom', 'Ymd\THis\Z', 'UTC');
+  else {
+    $utc = format_date($stamp, 'custom', 'Ymd\THis\Z', 'UTC');
+  }
   return $utc;
 }
 
