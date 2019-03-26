@@ -355,8 +355,8 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     if ($escape) {
       $text = addcslashes($text, ',;');
     }
-    // Text may not be wider than 75 characters.
-    // We consider the label length, too.
+    // Text may not be wider than 75 characters and must be indented,
+    // if wrapped. We consider the label length, too.
     if (strlen($text) > 75) {
       $text_array = explode("\n", $text);
       $paragraphs = array();
