@@ -9,7 +9,8 @@
  * Alter the HTML from an event's text fields before they get exported.
  *
  * @param array $text_fields
- *   Unchanged text fields (summary, description, location) as provided by the view.
+ *   Unchanged text fields (summary, description, location)
+ *   as provided by the view.
  * @param object $view
  *   The view object that is being executed to render the iCal feed.
  * @param array $context
@@ -20,25 +21,6 @@
  *   - options
  */
 function hook_viewsicalexport_field_html_alter(&$text_fields, $view, $context) {
-
-}
-
-/**
- * Modify an event's raw data.
- *
- * @param array $vevent
- *   The vevent array that is being added to the iCal feed.
- *   Sanitizing and escaping has been done now.
- * @param object $view
- *   The view object that is being executed to render the iCal feed.
- * @param array $context
- *   Associative array of context, with the following keys:
- *   - row
- *   - row_index
- *   - language
- *   - options
- */
-function hook_viewsicalexport_raw_event_alter(&$event, $view, $context) {
 
 }
 

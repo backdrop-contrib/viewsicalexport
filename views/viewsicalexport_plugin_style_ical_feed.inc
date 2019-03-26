@@ -13,7 +13,7 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
   /**
    * Internal helper function.
    */
-  protected function _get_option($option_name) {
+  protected function getOption($option_name) {
     return isset($this->options[$option_name]) ? $this->options[$option_name] : '';
   }
 
@@ -50,7 +50,7 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
     $url = url($this->view->get_url(NULL, $path), $url_options);
     // If the user didn't disable the option, change the scheme to webcal://
     // so calendar clients can automatically subscribe via the iCal link.
-    if (!$this->_get_option('disable_webcal')) {
+    if (!$this->getOption('disable_webcal')) {
       $url = str_replace(array('http://', 'https://'), 'webcal://', $url);
     }
 
@@ -102,14 +102,14 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
     $form['cal_name'] = array(
       '#type' => 'textfield',
       '#title' => t('iCal Calendar Name'),
-      '#default_value' => $this->_get_option('cal_name'),
+      '#default_value' => $this->getOption('cal_name'),
       '#description' => t('This will appear as the title of the iCal feed. If left blank, the View Title will be used.
         If that is also blank, the site name will be inserted as the iCal feed title.'),
     );
     $form['no_calname'] = array(
       '#type' => 'checkbox',
       '#title' => t('Exclude Calendar Name'),
-      '#default_value' => $this->_get_option('no_calname'),
+      '#default_value' => $this->getOption('no_calname'),
       '#description' => t("Excluding the X-WR-CALNAME value from the iCal Feed causes
         some calendar clients to add the events in the feed to an existing calendar, rather
         than creating a whole new calendar for them."),
@@ -117,7 +117,7 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
     $form['disable_webcal'] = array(
       '#type' => 'checkbox',
       '#title' => t('Disable webcal://'),
-      '#default_value' => $this->_get_option('disable_webcal'),
+      '#default_value' => $this->getOption('disable_webcal'),
       '#description' => t("By default, the feed URL will use the webcal:// scheme, which allows calendar
         clients to easily subscribe to the feed. If you want your users to instead download this iCal
         feed as a file, activate this option."),
@@ -125,7 +125,7 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
     $form['exclude_dtstamp'] = array(
       '#type' => 'checkbox',
       '#title' => t('Exclude DTSTAMP'),
-      '#default_value' => $this->_get_option('exclude_dtstamp'),
+      '#default_value' => $this->getOption('exclude_dtstamp'),
       '#description' => t("By default, the feed will set each event's DTSTAMP property to the time at which the feed got downloaded.
         Some feed readers will (incorrectly) look at the DTSTAMP value when they compare different downloads of the same feed, and
         conclcude that the event has been updated (even though it hasn't actually changed). Enable this option to exclude the DTSTAMP
@@ -134,7 +134,7 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
     $form['unescape_punctuation'] = array(
       '#type' => 'checkbox',
       '#title' => t('Unescape Commas and Semicolons'),
-      '#default_value' => $this->_get_option('unescape_punctuation'),
+      '#default_value' => $this->getOption('unescape_punctuation'),
       '#description' => t('In order to comply with the iCal spec, Views iCal Export will "escape" commas and semicolons (prepend them with backslashes).
         However, many calendar clients are bugged to not unescape these characters, leaving the backslashes littered throughout your events.
         Enable this option to skip escaping.'),
@@ -178,8 +178,8 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
 
     // Only include the X-WR-CALNAME property if the user didn't enable
     // the "Exclude Calendar Name" option.
-    if (!$this->_get_option('no_calname')) {
-      $cal_name = $this->_get_option('cal_name');
+    if (!$this->getOption('no_calname')) {
+      $cal_name = $this->getOption('cal_name');
       if (empty($cal_name)) {
         $cal_name = $this->view->get_title();
         if (empty($cal_name)) {
@@ -202,7 +202,7 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
 
       $vevent[] = 'BEGIN:VEVENT';
       $vevent[] = 'UID:' . $event['uid'];
-      if (!$this->_get_option('exclude_dtstamp')) {
+      if (!$this->getOption('exclude_dtstamp')) {
         $vevent[] = 'DTSTAMP:' . $dtstamp;
       }
       $vevent[] = 'SUMMARY:' . $event['summary'];

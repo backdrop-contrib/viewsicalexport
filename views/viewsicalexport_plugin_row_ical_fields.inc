@@ -216,10 +216,6 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     $event['location'] = $this->sanitizeText($text_fields['location'], $escape);
     $event['description'] = $this->sanitizeText($text_fields['description'], $escape);
 
-    // Allow other modules to alter the event object before it gets passed to
-    // the style plugin to be converted into an iCal VEVENT.
-    backdrop_alter('viewsicalexport_raw_event', $event, $this->view, $context);
-
     return $event;
   }
 
@@ -364,7 +360,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     if (strlen($text) > 75) {
       $text_array = explode("\n", $text);
       $paragraphs = array();
-      foreach($text_array as $paragraph) {
+      foreach ($text_array as $paragraph) {
         $paragraphs[] = wordwrap($paragraph, 63, "\r\n  ");
       }
       $text = implode("\r\n  ", $paragraphs);
