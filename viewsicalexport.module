@@ -41,18 +41,6 @@ function viewsicalexport_views_api() {
 }
 
 /**
- * Custom helper to sanitize text fields.
- */
-function viewsicalexport_sanitize_text($text, $escape = TRUE) {
-  $text = decode_entities($text);
-  $text = strip_tags($text);
-  if ($escape) {
-    $text = addcslashes($text, ',;');
-  }
-  return trim($text);
-}
-
-/**
  * FIXME remove these...?
  */
 /**
