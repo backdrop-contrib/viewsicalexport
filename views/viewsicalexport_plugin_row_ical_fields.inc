@@ -97,7 +97,6 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     if (array_key_exists($this->language, $substitutions)) {
       $this->language = $substitutions[$this->language];
     }
-    $this->repeated_dates = array();
   }
 
   /**
@@ -192,22 +191,6 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     $domain = preg_replace('#^https?://#', '', $base_url);
     $event['uid'] = "events.$entity_id.$date_field_name.$date_field_delta@$domain";
 
-    // Because of the way that Date implements repeating dates, we're going to
-    // be given a separate view result for each repeat. We only want to
-    // render a VEVENT (with an RRULE) for the first instance of that date, so
-    // we need to record the entity ID and field name for each result that has
-    // an RRULE, then skip any that we've already seen.
-    if (!empty($date['rrule'])) {
-      // FIXME pull out rrule completely.
-      $repeat_id = "$entity_id.$date_field_name";
-      if (!isset($this->repeated_dates[$repeat_id])) {
-        $this->repeated_dates[$repeat_id] = $repeat_id;
-      }
-      else {
-        return FALSE;
-      }
-    }
-
     // Retrieve the rendered text fields.
     $text_fields['summary'] = $this->getField($row->index, $this->options['title_field']);
     $text_fields['description'] = $this->getField($row->index, $this->options['description_field']);
@@ -254,7 +237,6 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
   protected function getRowDate($row, $date_field_name) {
     $start = NULL;
     $end = NULL;
-    $rrule = NULL;
     $delta = 0;
     $is_date_field = FALSE;
 
@@ -272,10 +254,6 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       }
       else {
         $end = clone $start;
-      }
-
-      if (isset($date_field['rrule'])) {
-        $rrule = $date_field['rrule'];
       }
     }
     elseif (is_numeric($date_field_value)) {
@@ -320,7 +298,6 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       'start' => $start,
       'end' => $end,
       'all_day' => $all_day,
-      'rrule' => $rrule,
     );
 
     return $date;

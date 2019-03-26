@@ -195,8 +195,7 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
     foreach ($events as $event) {
       $vevent = array();
       if (empty($event)) {
-        // The row plugin returned NULL for this row, which can happen due to
-        // either various error conditions, or because an RRULE is involved.
+        // The row plugin returned NULL for this row.
         // When this happens, just skip it.
         continue;
       }
