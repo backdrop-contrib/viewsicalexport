@@ -209,7 +209,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
 
     // Sanitize the text fields for iCal compliance, and add them to the event.
     $escape = TRUE;
-    if ($this->options['unescape_punctuation']) {
+    if ($this->view->style_options['unescape_punctuation']) {
       $escape = FALSE;
     }
     $event['summary'] = $this->sanitizeText($text_fields['summary'], $escape);
