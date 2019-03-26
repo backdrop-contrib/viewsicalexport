@@ -230,9 +230,9 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     if ($this->options['unescape_punctuation']) {
       $escape = FALSE;
     }
-    $event['summary'] = viewsicalexport_sanitize_text($text_fields['summary'], $escape);
-    $event['location'] = viewsicalexport_sanitize_text($text_fields['location'], $escape);
-    $event['description'] = viewsicalexport_sanitize_text($text_fields['description'], $escape);
+    $event['summary'] = $this->sanitizeText($text_fields['summary'], $escape);
+    $event['location'] = $this->sanitizeText($text_fields['location'], $escape);
+    $event['description'] = $this->sanitizeText($text_fields['description'], $escape);
 
     // Allow other modules to alter the event object before it gets passed to
     // the style plugin to be converted into an iCal VEVENT.
@@ -370,6 +370,24 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       return '';
     }
     return $this->view->style_plugin->get_field($index, $field_id);
+  }
+
+  /**
+   * Helper function to sanitize text fields.
+   *
+   * @param string $text
+   *   Field value from views field.
+   * @param bool $escape
+   *   Whether to escape punctuation.
+   */
+  protected function sanitizeText($text, $escape = TRUE) {
+    $text = decode_entities($text);
+    $text = strip_tags($text);
+    if ($escape) {
+      $text = addcslashes($text, ',;');
+    }
+    // FIXME: wordwrap/indent.
+    return trim($text);
   }
 
 }
