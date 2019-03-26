@@ -210,9 +210,9 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     }
 
     // Retrieve the rendered text fields.
-    $text_fields['summary'] = $this->get_field($row->index, $this->options['title_field']);
-    $text_fields['description'] = $this->get_field($row->index, $this->options['description_field']);
-    $text_fields['location'] = $this->get_field($row->index, $this->options['location_field']);
+    $text_fields['summary'] = $this->getField($row->index, $this->options['title_field']);
+    $text_fields['description'] = $this->getField($row->index, $this->options['description_field']);
+    $text_fields['location'] = $this->getField($row->index, $this->options['location_field']);
 
     // Allow other modules to alter the rendered text fields before they get
     // sanitized for iCal-compliance. This is most useful for fields of type
@@ -334,11 +334,8 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
    *
    * @param array $view_fields
    *   An associative array like views_plugin_display::get_field_labels().
-   *
-   * @return array
-   *   An associative array (alias => label) of date fields.
    */
-  protected function getDateFieldCandidates($view_fields) {
+  protected function getDateFieldCandidates(array $view_fields) {
     $handlers = $this->display->handler->get_handlers('field');
     $field_candidates = array();
     // These are Date, Date (ISO format), and Date (Unix timestamp).
@@ -365,7 +362,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
    *
    * @see views_plugin_style::get_field()
    */
-  protected function get_field($index, $field_id) {
+  protected function getField($index, $field_id) {
     if (empty($this->view->style_plugin) || !is_object($this->view->style_plugin) || empty($field_id)) {
       return '';
     }
