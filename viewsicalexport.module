@@ -41,6 +41,40 @@ function viewsicalexport_views_api() {
 }
 
 /**
+ * Implements hook_theme().
+ */
+function viewsicalexport_theme($existing, $type, $theme, $path) {
+  return array(
+    'viewsicalexport_icon' => array(
+      'variables' => array('url' => NULL, 'tooltip' => NULL),
+    ),
+  );
+}
+
+/**
+ * Theme function for the ical icon used by attached iCal feed.
+ *
+ * Available variables are:
+ * $variables['tooltip'] - The tooltip to be used for the ican feed icon.
+ * $variables['url'] - The url to the actual iCal feed.
+ * $variables['view'] - The view object from which the iCal feed is being
+ *   built (useful for contextual information).
+ */
+function theme_viewsicalexport_icon($variables) {
+  if (empty($variables['tooltip'])) {
+    $variables['tooltip'] = t('Add this event to my calendar');
+  }
+  $variables['path'] = backdrop_get_path('module', 'viewsicalexport') . '/images/ical-feed-icon.png';
+  $variables['alt'] = $variables['title'] = $variables['tooltip'];
+  if ($image = theme('image', $variables)) {
+    return "<a href='{$variables['url']}' class='ical-icon'>$image</a>";
+  }
+  else {
+    return "<a href='{$variables['url']}' class='ical-icon'>{$variables['tooltip']}</a>";
+  }
+}
+
+/**
  * Exception used by iCal Fields for when a date field is blank.
  */
 class BlankDateFieldException extends Exception {}

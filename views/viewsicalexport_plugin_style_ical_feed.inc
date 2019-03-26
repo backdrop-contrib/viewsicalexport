@@ -56,7 +56,7 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
 
     // Render the feed icon and header tag (except during a View Preview).
     if (empty($this->view->live_preview)) {
-      $tooltip = t('Add to My Calendar');
+      $tooltip = t('Subscribe to this calendar');
       if (!isset($this->view->feed_icon)) {
         // In PHP 5.5, you're not allowed to concatinate onto an unset
         // property. But we need to do a concat, because there may be
