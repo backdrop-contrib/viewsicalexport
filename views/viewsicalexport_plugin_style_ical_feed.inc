@@ -18,6 +18,25 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
   }
 
   /**
+   * Helper function that creates date string from object.
+   *
+   * @param object $date
+   *   BackdropDateTime object.
+   * @param bool $date_only
+   *   Whether cardinality should be full or date only.
+   */
+  protected function dateObjectToString($date, $date_only = FALSE) {
+    $stamp = $date->format('U');
+    if ($date_only) {
+      $utc = format_date($stamp, 'custom', 'Ymd', 'UTC');
+    }
+    else {
+      $utc = format_date($stamp, 'custom', 'Ymd\THis\Z', 'UTC');
+    }
+    return $utc;
+  }
+
+  /**
    * Sets up the iCal feed icon on pages.
    */
   public function attach_to($display_id, $path, $title) {
@@ -191,20 +210,20 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
 
       if ($event['all_day']) {
         // All Day events need to be DATEs, rather than DATE-TIMEs.
-        $vevent[] = 'DTSTART;VALUE=DATE:' . viewsicalexport_ical_utc($event['start'], TRUE);
+        $vevent[] = 'DTSTART;VALUE=DATE:' . $this->dateObjectToString($event['start'], TRUE);
       }
       else {
-        $vevent[] = 'DTSTART:' . viewsicalexport_ical_utc($event['start']);
+        $vevent[] = 'DTSTART:' . $this->dateObjectToString($event['start']);
       }
 
       // Only add the end date if there is one.
       if (!empty($event['end'])) {
         if ($event['all_day']) {
           // FIXME can dtend be omitted in this case?
-          $vevent[] = 'DTEND;VALUE=DATE:' . viewsicalexport_ical_utc($event['end'], TRUE);
+          $vevent[] = 'DTEND;VALUE=DATE:' . $this->dateObjectToString($event['end'], TRUE);
         }
         else {
-          $vevent[] = 'DTEND:' . viewsicalexport_ical_utc($event['end']);
+          $vevent[] = 'DTEND:' . $this->dateObjectToString($event['end']);
         }
       }
       if (!empty($event['location'])) {
@@ -214,10 +233,10 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
         $vevent[] = 'DESCRIPTION:' . $event['description'];
       }
       if (!empty($event['last-modified'])) {
-        $vevent[] = 'LAST-MODIFIED:' . viewsicalexport_ical_utc($event['last-modified']);
+        $vevent[] = 'LAST-MODIFIED:' . $this->dateObjectToString($event['last-modified']);
       }
       if (!empty($event['created'])) {
-        $vevent[] = 'CREATED:' . viewsicalexport_ical_utc($event['created']);
+        $vevent[] = 'CREATED:' . $this->dateObjectToString($event['created']);
       }
       $vevent[] = 'END:VEVENT';
 

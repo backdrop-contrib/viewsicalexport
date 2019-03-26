@@ -41,25 +41,6 @@ function viewsicalexport_views_api() {
 }
 
 /**
- * Custom helper function to convert dates.
- *
- * @param object $date
- *   BackdropDateTime object.
- * @param bool $date_only
- *   Whether cardinality should be full or date only.
- */
-function viewsicalexport_ical_utc($date, $date_only = FALSE) {
-  $stamp = $date->format('U');
-  if ($date_only) {
-    $utc = format_date($stamp, 'custom', 'Ymd', 'UTC');
-  }
-  else {
-    $utc = format_date($stamp, 'custom', 'Ymd\THis\Z', 'UTC');
-  }
-  return $utc;
-}
-
-/**
  * Custom helper to sanitize text fields.
  */
 function viewsicalexport_sanitize_text($text, $escape = TRUE) {
