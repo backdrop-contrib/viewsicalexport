@@ -218,7 +218,6 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
       // Only add the end date if there is one.
       if (!empty($event['end'])) {
         if ($event['all_day']) {
-          // FIXME can dtend be omitted in this case?
           $vevent[] = 'DTEND;VALUE=DATE:' . $this->dateObjectToString($event['end'], TRUE);
         }
         else {
