@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Defines the iCal Fields row style plugin.
+ * Defines the Views iCal Export fields row style plugin.
  */
 
 /**
@@ -19,7 +19,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     $options['title_field'] = array('default' => '');
     $options['description_field'] = array('default' => '');
     $options['location_field'] = array('default' => '');
-    $options['additional_settings']['skip_blank_dates'] = array('default' => FALSE);
+    $options['additional_settings']['skip_blank_dates'] = array('default' => TRUE);
     return $options;
   }
 
@@ -43,7 +43,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       '#type' => 'select',
       '#title' => t('Date field'),
       '#description' => t('The views field to use as the start (and possibly end) time for each event (DTSTART/DTEND).
-        If you retain the default ("First populated Date field"), Date iCal will use the first non-empty Date field in the row.'),
+        If you retain the default ("First populated Date field"), Views iCal Export will use the first non-empty Date field in the row.'),
       '#options' => $date_field_label_options,
       '#default_value' => $this->options['date_field'],
       '#required' => TRUE,
@@ -59,9 +59,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     $form['description_field'] = array(
       '#type' => 'select',
       '#title' => t('Description field'),
-      '#description' => t("The views field to use as the body text for each event (DESCRIPTION).<br>
-          If you wish to include more than one entity field in the event body, you may want to use the 'Content: Rendered Node' views field,
-          and set it to the 'iCal' view mode. Then configure the iCal view mode on your event nodes to include the text you want."),
+      '#description' => t("The views field to use as the body text for each event (DESCRIPTION).<br>"),
       '#options' => $text_field_label_options,
       '#default_value' => $this->options['description_field'],
       '#required' => FALSE,
@@ -177,7 +175,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       $date_field_delta = $row->{"field_data_{$date_field_name}_delta"};
     }
     else {
-      // I'm not sure why the "field_data_{field_name}_delta" field is part of
+      // Not sure why the "field_data_{field_name}_delta" field is part of
       // the $row, so it's possible that it will sometimes be missing. If it
       // is, make an educated guess about the delta by comparing this row's
       // start date to each of the entity's dates.
@@ -200,6 +198,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     // we need to record the entity ID and field name for each result that has
     // an RRULE, then skip any that we've already seen.
     if (!empty($date['rrule'])) {
+      // FIXME pull out rrule completely.
       $repeat_id = "$entity_id.$date_field_name";
       if (!isset($this->repeated_dates[$repeat_id])) {
         $this->repeated_dates[$repeat_id] = $repeat_id;
