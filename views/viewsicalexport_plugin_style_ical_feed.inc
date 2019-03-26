@@ -241,14 +241,14 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
       $vevent[] = 'END:VEVENT';
 
       // Allow other modules to alter the vevent before it's exported.
-      backdrop_alter('viewsicalexport_export_vevent', $vevent, $this->view, $event);
+      backdrop_alter('viewsicalexport_vevent', $vevent, $this->view, $event);
       $vcalendar[] = implode("\r\n", $vevent);
     }
 
     $vcalendar[] = 'END:VCALENDAR';
 
     // Allow other modules to alter the vcalendar before it's exported.
-    backdrop_alter('viewsicalexport_export_vcalendar', $vcalendar, $this->view);
+    backdrop_alter('viewsicalexport_vcalendar', $vcalendar, $this->view);
     $output = implode("\r\n", $vcalendar);
     // FIXME wordwrap isn't enough, indentation is needed.
     $output = wordwrap($output, 75, "\r\n");
@@ -274,7 +274,7 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
     }
 
     // Allow other modules to alter the rendered calendar.
-    backdrop_alter('viewsicalexport_export_post_render', $output, $this->view);
+    backdrop_alter('viewsicalexport_post_render', $output, $this->view);
 
     return $output;
   }

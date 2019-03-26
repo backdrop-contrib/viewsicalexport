@@ -20,11 +20,11 @@ function viewsicalexport_autoload_info() {
  */
 function viewsicalexport_hook_info() {
   $hooks = array(
-    'viewsicalexport_export_html_alter',
-    'viewsicalexport_export_raw_event_alter',
-    'viewsicalexport_export_vevent_alter',
-    'viewsicalexport_export_vcalendar_alter',
-    'viewsicalexport_export_post_render_alter',
+    'viewsicalexport_html_alter',
+    'viewsicalexport_raw_event_alter',
+    'viewsicalexport_vevent_alter',
+    'viewsicalexport_vcalendar_alter',
+    'viewsicalexport_post_render_alter',
   );
 
   return array_fill_keys($hooks, array('group' => 'viewsicalexport'));
