@@ -2,7 +2,7 @@
 
 /**
  * @file
- * Views style plugin for the Date iCal module.
+ * Views style plugin for the Views iCal Export module.
  */
 
 /**
@@ -135,9 +135,9 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
       '#type' => 'checkbox',
       '#title' => t('Unescape Commas and Semicolons'),
       '#default_value' => $this->_get_option('unescape_punctuation'),
-      '#description' => t('In order to comply with the iCal spec, Date iCal will "escape" commas and semicolons (prepend them with backslashes).
+      '#description' => t('In order to comply with the iCal spec, Views iCal Export will "escape" commas and semicolons (prepend them with backslashes).
         However, many calendar clients are bugged to not unescape these characters, leaving the backslashes littered throughout your events.
-        Enable this option to have Date iCal unescape these characters before it exports the iCal feed.'),
+        Enable this option to skip escaping.'),
     );
   }
 
