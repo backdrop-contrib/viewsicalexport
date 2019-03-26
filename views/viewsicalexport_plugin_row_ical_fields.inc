@@ -19,7 +19,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     $options['title_field'] = array('default' => '');
     $options['description_field'] = array('default' => '');
     $options['location_field'] = array('default' => '');
-    $options['additional_settings']['skip_blank_dates'] = array('default' => TRUE);
+    $options['additional_settings']['skip_blank_dates'] = array('default' => FALSE);
     return $options;
   }
 
