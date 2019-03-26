@@ -250,8 +250,6 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
     // Allow other modules to alter the vcalendar before it's exported.
     backdrop_alter('viewsicalexport_vcalendar', $vcalendar, $this->view);
     $output = implode("\r\n", $vcalendar);
-    // FIXME wordwrap isn't enough, indentation is needed.
-    $output = wordwrap($output, 75, "\r\n");
 
     // These steps shouldn't be run during Preview on the View page.
     if (empty($this->view->live_preview)) {
