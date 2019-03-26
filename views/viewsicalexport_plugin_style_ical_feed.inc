@@ -239,7 +239,7 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
       $vevent[] = 'END:VEVENT';
 
       // Allow other modules to alter the vevent before it's exported.
-      backdrop_alter('viewsicalexport_vevent', $vevent, $this->view, $event);
+      backdrop_alter('viewsicalexport_vevent', $vevent, $this->view);
       $vcalendar[] = implode("\r\n", $vevent);
     }
 

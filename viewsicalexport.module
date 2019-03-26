@@ -20,7 +20,7 @@ function viewsicalexport_autoload_info() {
  */
 function viewsicalexport_hook_info() {
   $hooks = array(
-    'viewsicalexport_html_alter',
+    'viewsicalexport_field_html_alter',
     'viewsicalexport_raw_event_alter',
     'viewsicalexport_vevent_alter',
     'viewsicalexport_vcalendar_alter',

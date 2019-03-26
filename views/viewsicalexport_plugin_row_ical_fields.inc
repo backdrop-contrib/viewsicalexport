@@ -205,7 +205,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       'language' => $this->language,
       'options' => $this->options,
     );
-    backdrop_alter('viewsicalexport_html', $text_fields, $this->view, $context);
+    backdrop_alter('viewsicalexport_field_html', $text_fields, $this->view, $context);
 
     // Sanitize the text fields for iCal compliance, and add them to the event.
     $escape = TRUE;
