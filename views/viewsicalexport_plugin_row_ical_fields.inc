@@ -29,7 +29,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
   public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
     $all_field_labels = $this->display->handler->get_field_labels();
-    $date_field_labels = $this->get_date_field_candidates($all_field_labels);
+    $date_field_labels = $this->getDateFieldCandidates($all_field_labels);
     $date_field_label_options = array_merge(array('first_available' => t('First populated Date field')), $date_field_labels);
     $text_field_label_options = array_merge(array('' => t('- None -')), $all_field_labels);
 
@@ -135,7 +135,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
         }
         throw new BlankDateFieldException(t("The row titled %title has no available Date value. An iCal entry cannot be created for it.", array('%title' => $title)));
       }
-      $date = $this->get_row_date($row, $date_field_name);
+      $date = $this->getRowDate($row, $date_field_name);
     }
     catch (BlankDateFieldException $e) {
       // Unless the user has specifically said that they want to skip rows
@@ -252,7 +252,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
    * @return array
    *   The normalized array.
    */
-  protected function get_row_date($row, $date_field_name) {
+  protected function getRowDate($row, $date_field_name) {
     $start = NULL;
     $end = NULL;
     $rrule = NULL;
@@ -338,7 +338,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
    * @return array
    *   An associative array (alias => label) of date fields.
    */
-  protected function get_date_field_candidates($view_fields) {
+  protected function getDateFieldCandidates($view_fields) {
     $handlers = $this->display->handler->get_handlers('field');
     $field_candidates = array();
     // These are Date, Date (ISO format), and Date (Unix timestamp).
