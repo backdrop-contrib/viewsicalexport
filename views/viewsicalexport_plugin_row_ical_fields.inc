@@ -152,7 +152,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     $entity_type = $row->_field_data[$this->view->base_field]['entity_type'];
     // Add the CREATED, LAST-MODIFIED, and URL components based on the entity.
     // According to the iCal standard, CREATED and LAST-MODIFIED must be UTC.
-    // Fortunately, Drupal stores timestamps in the DB as UTC, so we just need
+    // Fortunately, Backdrop stores timestamps in the DB as UTC, so we just need
     // to specify that UTC be used rather than the server's local timezone.
     if (isset($entity->created)) {
       $event['created'] = new BackdropDateTime($entity->created, 'UTC');
