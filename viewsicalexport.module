@@ -41,19 +41,6 @@ function viewsicalexport_views_api() {
 }
 
 /**
- * FIXME remove these...?
- */
-/**
- * Exception class for generic exceptions thrown by this module.
- */
-class DateIcalException extends Exception {}
-
-/**
  * Exception used by iCal Fields for when a date field is blank.
  */
-class BlankDateFieldException extends DateIcalException {}
-
-/**
- * Exception thrown when the Feeds parser plugin fails.
- */
-class DateIcalParseException extends DateIcalException {}
+class BlankDateFieldException extends Exception {}
