@@ -3,9 +3,9 @@
 This module enables you to export iCal feeds (also known as vcalendar) from views, using the
 "iCal Feed" and "iCal Fields" views plugins.
 
-A typical use case is a view with event nodes (any content type with date fields). 
+A typical use case is a view from event nodes (any content type with date fields). 
 Using this module, you can attach an iCal feed to your views' page, so visitors are able
-to subscribe to your events via their calendars.
+to add your events to their calendar and get them updated automatically.
 
 ## Installation
 
