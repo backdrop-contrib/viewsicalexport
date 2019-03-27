@@ -25,8 +25,9 @@ Two Backdrop modules are required, both come with Backdrop core:
 This module is a complete rewrite of the Date iCal Drupal module.
 Unlike Date iCal it doesn't require external libraries, but it has of course less features.
 
-Date iCal was initially written Karen Stevenson (https://www.drupal.org/u/karens), for a long time maintained 
+Date iCal was initially written by Karen Stevenson (https://www.drupal.org/u/karens), for a long time maintained
 by coredumperror (https://www.drupal.org/u/coredumperror) and ported to Backdrop by John Franklin (https://github.com/jlfranklin).
+So the original module, Views iCal Export has been derived from, is also available for Backdrop.
 
 ## License
 
