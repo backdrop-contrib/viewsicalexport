@@ -357,14 +357,12 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     }
     // Text may not be wider than 75 characters and must be indented,
     // if wrapped. We consider the label length, too.
-    if (strlen($text) > 75) {
-      $text_array = explode("\n", $text);
-      $paragraphs = array();
-      foreach ($text_array as $paragraph) {
-        $paragraphs[] = wordwrap($paragraph, 63, "\r\n  ");
-      }
-      $text = implode("\r\n  ", $paragraphs);
+    $text_array = explode("\n", $text);
+    $paragraphs = array();
+    foreach ($text_array as $paragraph) {
+      $paragraphs[] = wordwrap($paragraph, 63, "\r\n  ");
     }
+    $text = implode("\r\n  ", $paragraphs);
     return trim($text);
   }
 
