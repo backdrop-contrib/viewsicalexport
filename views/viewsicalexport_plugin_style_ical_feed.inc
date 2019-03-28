@@ -28,12 +28,14 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
   protected function dateObjectToString($date, $date_only = FALSE) {
     $stamp = $date->format('U');
     if ($date_only) {
-      $utc = format_date($stamp, 'custom', 'Ymd', 'UTC');
+      // Use original timezone for date_only, as UTC would lead to
+      // unexpected results then.
+      $formatted = format_date($stamp, 'custom', 'Ymd', $date->timezone);
     }
     else {
-      $utc = format_date($stamp, 'custom', 'Ymd\THis\Z', 'UTC');
+      $formatted = format_date($stamp, 'custom', 'Ymd\THis\Z', 'UTC');
     }
-    return $utc;
+    return $formatted;
   }
 
   /**

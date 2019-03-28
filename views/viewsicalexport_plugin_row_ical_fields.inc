@@ -243,7 +243,6 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     if (isset($date_field_value[$delta]) && is_array($date_field_value[$delta])) {
       $is_date_field = TRUE;
       $date_field = $date_field_value[$delta];
-
       $start = new BackdropDateTime($date_field['value'], $date_field['timezone_db']);
       if (!empty($date_field['value2'])) {
         $end = new BackdropDateTime($date_field['value2'], $date_field['timezone_db']);
@@ -283,11 +282,13 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       $granularity
     );
 
+    // According to RFC 2445 (clarified in RFC 5545) the DTEND value is
+    // non-inclusive.
     if ($all_day) {
-      // According to RFC 2445 (clarified in RFC 5545) the DTEND value is
-      // non-inclusive. When dealing with All Day values, they are DATEs rather
-      // than DATETIMEs, so we need to add a day to conform to RFC.
       $end->modify("+1 day");
+    }
+    elseif ($start == $end) {
+      $end->modify("+1 second");
     }
 
     $date = array(
