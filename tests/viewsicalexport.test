@@ -116,7 +116,7 @@ class ViewsicalexportTestCase extends BackdropWebTestCase {
     $lines = explode("\r\n", $content);
     $success = $this->assertTrue(count($lines) == 21, 'Carriage return in use and line count is correct');
     if (!$success) {
-      $this->verbose('<br />Expected: 20 lines with carriage return<br />Got:<pre>' . check_plain($content) . '</pre>');
+      $this->verbose('<br />Expected: 21 lines with carriage return<br />Got:<pre>' . check_plain($content) . '</pre>');
     }
 
     // Search for escaped comma in location field.
