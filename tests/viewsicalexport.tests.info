@@ -1,5 +1,5 @@
 [ViewsicalexportTestCase]
 name = Views iCal Export render
-description = if I only knew
+description = Check for rendered results of an example view for our feed type.
 group = Views iCal Export
 file = viewsicalexport.test
