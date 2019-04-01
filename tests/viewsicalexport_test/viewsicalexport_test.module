@@ -1,0 +1,6 @@
+<?php
+
+/**
+ * @file
+ * Submodule to add view and node type definitions via config.
+ */

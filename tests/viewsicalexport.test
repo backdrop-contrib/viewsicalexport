@@ -1,0 +1,132 @@
+<?php
+
+/**
+ * @file
+ * Test Views iCal Export rendering.
+ */
+
+//require_once BACKDROP_ROOT . '/core/modules/views/tests/views_query.test';
+//require_once BACKDROP_ROOT . '/core/modules/views/tests/styles/views_plugin_style_base.test';
+
+class ViewsicalexportTestCase extends BackdropWebTestCase {
+  protected function setUp() {
+    // Module viewsicalexport_test comes with config files
+    // for a content type and a view.
+    parent::setUp(array('viewsicalexport_test'));
+
+    // Can't get field creation working with json config, doing it here.
+    // Create date field for event.
+    $datefield = array(
+      'field_name' => 'field_datefield',
+      'type' => 'date',
+      'settings' => array(
+        'granularity' => array(
+          'year' => 'year',
+          'month' => 'month',
+          'day' => 'day',
+          'hour' => 'hour',
+          'minute' => 'minute',
+          'second' => 0
+        ),
+      ),
+    );
+    field_create_field($datefield);
+    $dateinstance = array(
+      'field_name' => 'field_datefield',
+      'entity_type' => 'node',
+      'bundle' => 'event'
+    );
+    field_create_instance($dateinstance);
+    // Create location field for event.
+    $locationfield = array(
+      'field_name' => 'field_location',
+      'type' => 'text',
+    );
+    field_create_field($locationfield);
+    $locationinstance = array(
+      'field_name' => 'field_location',
+      'entity_type' => 'node',
+      'bundle' => 'event'
+    );
+    field_create_instance($locationinstance);
+    // Create description field for event.
+    $bodyinstance = array(
+      'field_name' => 'body',
+      'entity_type' => 'node',
+      'bundle' => 'event'
+    );
+    field_create_instance($bodyinstance);
+  }
+
+  public function testRenderedIcalVcalendar() {
+    $longtext = '<p>This is text including some markup</p><p>Lorem ipsum dolor sit amet, ';
+    $longtext .= 'consectetuer adipiscing elit. Aliquam aliquam blandit ante. Nullam enim nibh, ';
+    $longtext .= 'ultricies at, tempus ultrices, sodales eu, magna. Proin faucibus nunc non odio.</p>';
+    $settings = array(
+      'type' => 'event',
+      'title' => 'My first event',
+      'path' => array(
+        'alias' => 'findme'
+      ),
+      'body' => array(
+        LANGUAGE_NONE => array(
+          0 => array(
+            'value' => $longtext,
+          )
+        )
+      ),
+      'field_datefield' => array(
+        LANGUAGE_NONE => array(
+          0 => array(
+            'value' => '2019-03-31T22:00:00',
+            'value2' => '2019-03-31T22:00:00',
+          )
+        )
+      ),
+      'field_location' => array(
+        LANGUAGE_NONE => array(
+          0 => array(
+            'value' => 'Somestreet 123, 12345 Somecity, Country',
+          )
+        )
+      ),
+    );
+    // Save node to database.
+    $node = $this->backdropCreateNode($settings);
+
+    // Try to load the ical feed.
+    $content = $this->backdropGet('icalpath.ics');
+
+    // Is this actually vcalendar?
+    $header = $this->backdropGetHeader('content-type');
+    $expected = 'text/calendar; charset=UTF-8';
+    $success = $this->assertEqual($expected, $header, 'The view creates "text/calendar; charset=UTF-8"');
+    if (!$success) {
+      $this->verbose('<br />Expected: "' . $expected . '"<br />Got:<pre>' . check_plain($header) . '</pre>');
+    }
+
+    // Inspect contents of that view output.
+    $lines = explode("\r\n", $content);
+    $success = $this->assertTrue(count($lines) == 21, 'Carriage return in use and line count is correct');
+    if (!$success) {
+      $this->verbose('<br />Expected: 20 lines with carriage return<br />Got:<pre>' . check_plain($content) . '</pre>');
+    }
+
+    // Search for escaped comma in location field.
+    $expected = 'LOCATION:Somestreet 123\, 12345 Somecity\, Country';
+    $success = $this->assertTrue(in_array($expected, $lines), 'LOCATION field found and it\'s escaped correctly');
+
+    // Find the longest line and check, it's shorter than 75.
+    $maxlength = max(array_map('strlen', $lines));
+    $success = $this->assertTrue($maxlength < 75, 'The longest line is shorter than 75 characters.');
+
+    // Textfields like DESCRIPTION must be indented by two spaces, if wrapped.
+    $desc_part = array($lines[13], $lines[14], $lines[15], $lines[16]);
+    $found = preg_grep('/^  /', $desc_part);
+    $success = $this->assertTrue(count($found) == 4, 'DESCRIPTION text field is properly indented');
+    if (!$success) {
+      $this->verbose('<br />Got:<pre>' . implode("\r\n", $desc_part) . '</pre>');
+    }
+  }
+
+}
