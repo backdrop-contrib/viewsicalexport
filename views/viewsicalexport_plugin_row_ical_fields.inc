@@ -19,6 +19,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     $options['title_field'] = array('default' => '');
     $options['description_field'] = array('default' => '');
     $options['location_field'] = array('default' => '');
+    $options['attach_url'] = array('default' => 0);
     $options['additional_settings']['skip_blank_dates'] = array('default' => FALSE);
     return $options;
   }
@@ -71,6 +72,13 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       '#options' => $text_field_label_options,
       '#default_value' => $this->options['location_field'],
       '#required' => FALSE,
+    );
+    $form['attach_url'] = array(
+      '#type' => 'checkbox',
+      '#title' => t('Attach entity url'),
+      '#prefix' => '<p><strong>Link</strong></p>',
+      '#description' => t('Attach the entity url to VEVENTS, so the calendar item has a link to your event.'),
+      '#default_value' => $this->options['attach_url'],
     );
     $form['additional_settings'] = array(
       '#type' => 'fieldset',
@@ -130,11 +138,11 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
         if (empty($title)) {
           $title = "Undetermined title";
         }
-        throw new BlankDateFieldException(t("The row titled %title has no available Date value. An iCal entry cannot be created for it.", array('%title' => $title)));
+        throw new ViewsicalexportBlankDateFieldException(t("The row titled %title has no available Date value. An iCal entry cannot be created for it.", array('%title' => $title)));
       }
       $date = $this->getRowDate($row, $date_field_name);
     }
-    catch (BlankDateFieldException $e) {
+    catch (ViewsicalexportBlankDateFieldException $e) {
       // Unless the user has specifically said that they want to skip rows
       // with blank dates, let this exception percolate.
       if ($this->options['additional_settings']['skip_blank_dates']) {
@@ -164,9 +172,11 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       // If changed is unset, but created is, use that for last-modified.
       $event['last-modified'] = new BackdropDateTime($entity->created, 'UTC');
     }
-    $uri = entity_uri($entity_type, $entity);
-    $uri['options']['absolute'] = TRUE;
-    $event['url'] = url($uri['path'], $uri['options']);
+    if ($this->options['attach_url']) {
+      $uri = entity_uri($entity_type, $entity);
+      $uri['options']['absolute'] = TRUE;
+      $event['url'] = url($uri['path'], $uri['options']);
+    }
 
     // Generate a unique ID for this event by emulating the way the Date module
     // creates a Date ID.
@@ -187,8 +197,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       }
     }
     $entity_id = $row->{$this->view->base_field};
-    global $base_url;
-    $domain = preg_replace('#^https?://#', '', $base_url);
+    $domain = $_SERVER['SERVER_NAME'];
     $event['uid'] = "events.$entity_id.$date_field_name.$date_field_delta@$domain";
 
     // Retrieve the rendered text fields.
@@ -259,7 +268,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     else {
       // Processing cannot proceed with a blank date value.
       $title = strip_tags($this->view->style_plugin->get_field($row->index, $this->options['title_field']));
-      throw new BlankDateFieldException(t("The row %title has a blank date. An iCal entry cannot be created for it.", array('%title' => $title)));
+      throw new ViewsicalexportBlankDateFieldException(t("The row %title has a blank date. An iCal entry cannot be created for it.", array('%title' => $title)));
     }
 
     // Set the display timezone to whichever tz is stored for this field.

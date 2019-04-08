@@ -238,6 +238,9 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
       if (!empty($event['created'])) {
         $vevent[] = 'CREATED:' . $this->dateObjectToString($event['created']);
       }
+      if (!empty($event['url'])) {
+        $vevent[] = wordwrap('ATTACH:' . $event['url'], 75, "\r\n ", TRUE);
+      }
       $vevent[] = 'END:VEVENT';
 
       // Allow other modules to alter the vevent before it's exported.

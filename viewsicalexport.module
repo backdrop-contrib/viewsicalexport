@@ -76,4 +76,4 @@ function theme_viewsicalexport_icon($variables) {
 /**
  * Exception used by iCal Fields for when a date field is blank.
  */
-class BlankDateFieldException extends Exception {}
+class ViewsicalexportBlankDateFieldException extends Exception {}
