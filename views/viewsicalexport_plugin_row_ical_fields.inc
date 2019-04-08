@@ -372,7 +372,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     foreach ($text_array as $paragraph) {
       $paragraphs[] = wordwrap($paragraph, 63, "\r\n  ");
     }
-    $text = implode("\r\n  ", $paragraphs);
+    $text = implode("\\n\\n\r\n ", $paragraphs);
     return trim($text);
   }
 
