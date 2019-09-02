@@ -26,6 +26,8 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
    *   Whether cardinality should be full or date only.
    */
   protected function dateObjectToString($date, $date_only = FALSE) {
+    // Make sure, all properties are available, even for cloned dates.
+    get_object_vars($date);
     $stamp = $date->format('U');
     if ($date_only) {
       // Use original timezone for date_only, as UTC would lead to
