@@ -250,14 +250,20 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
 
     // Handle date fields.
     if (isset($date_field_value[$delta]) && is_array($date_field_value[$delta])) {
-      $is_date_field = TRUE;
-      $date_field = $date_field_value[$delta];
-      $start = new BackdropDateTime($date_field['value'], $date_field['timezone_db']);
-      if (!empty($date_field['value2'])) {
-        $end = new BackdropDateTime($date_field['value2'], $date_field['timezone_db']);
+      if (isset($date_field_value[$delta]['value'])) {
+        $is_date_field = TRUE;
+        $date_field = $date_field_value[$delta];
+        $start = new BackdropDateTime($date_field['value'], $date_field['timezone_db']);
+        if (!empty($date_field['value2'])) {
+          $end = new BackdropDateTime($date_field['value2'], $date_field['timezone_db']);
+        }
+        else {
+          $end = clone $start;
+        }
       }
-      else {
-        $end = clone $start;
+      elseif (isset($date_field_value[$delta]['dtstart'])) {
+        $start = new BackdropDateTime($date_field_value[$delta]['dtstart'], 'UTC');
+        $end = new BackdropDateTime($date_field_value[$delta]['dtend'], 'UTC');
       }
     }
     elseif (is_numeric($date_field_value)) {
@@ -321,7 +327,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     $handlers = $this->display->handler->get_handlers('field');
     $field_candidates = array();
     // These are Date, Date (ISO format), and Date (Unix timestamp).
-    $date_fields = array('datetime', 'date', 'datestamp');
+    $date_fields = array('datetime', 'date', 'datestamp', 'repeating_date');
 
     foreach ($view_fields as $alias => $label) {
       $handler_class = get_class($handlers[$alias]);
