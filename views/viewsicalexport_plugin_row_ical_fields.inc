@@ -120,7 +120,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
         if (strpos($name, 'field_field') === 0) {
           // This property's name starts with "field_field", which means it's
           // the actual field data for a field in this view.
-          if (!empty($value[0]['raw']['date_type'])) {
+          if (!empty($value[0]['raw']['date_type']) || !empty($value[0]['raw']['dtstart'])) {
             // Cut off the first "field_" from $name to get the field name.
             $date_field_name = substr($name, 6);
             break;
