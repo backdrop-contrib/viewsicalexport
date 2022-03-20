@@ -7,6 +7,8 @@ A typical use case is a view from event nodes (any content type with date fields
 Using this module, you can attach an iCal feed to your views' page, so visitors are able
 to add your events to their calendar and get them updated automatically.
 
+![Icon screenshot](https://raw.githubusercontent.com/backdrop-contrib/viewsicalexport/1.x-1.x/screenshots/ical-icon-subscribe-calendar.png)
+
 ## Installation
 
 Install this module using the official Backdrop CMS instructions at https://backdropcms.org/guide/modules
