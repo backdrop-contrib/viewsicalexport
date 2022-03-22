@@ -189,10 +189,27 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       // is, make an educated guess about the delta by comparing this row's
       // start date to each of the entity's dates.
       $date_field_delta = 0;
-      foreach ($entity->{$date_field_name}['und'] as $ndx => $date_array) {
-        if ($date['start']->originalTime == $date_array['value']) {
-          $date_field_delta = $ndx;
-          break;
+      if (isset($entity->{$date_field_name})) {
+        foreach ($entity->{$date_field_name}['und'] as $ndx => $date_array) {
+          if ($date['start']->originalTime == $date_array['value']) {
+            $date_field_delta = $ndx;
+            break;
+          }
+        }
+      }
+      else {
+        // Repeating date fields also expose subvalues to views.
+        if (substr_compare($date_field_name, '_dtstart', -8) === 0) {
+          $real_field_name = substr($date_field_name, 0, -8);
+          if (isset($row->{"field_data_{$real_field_name}_delta"})) {
+            $date_field_delta = $row->{"field_data_{$real_field_name}_delta"};
+          }
+        }
+        elseif (substr_compare($date_field_name, '_dtend', -6) === 0) {
+          $real_field_name = substr($date_field_name, 0, -6);
+          if (isset($row->{"field_data_{$real_field_name}_delta"})) {
+            $date_field_delta = $row->{"field_data_{$real_field_name}_delta"};
+          }
         }
       }
     }
