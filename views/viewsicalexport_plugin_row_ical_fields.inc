@@ -91,7 +91,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       '#title' => t('Skip blank dates'),
       '#description' => t('Normally, if a view result has a blank date field, the feed will display an error,
         because it is impossible to create an iCal event with no date. This option makes Views silently skip those results, instead.'),
-      '#default_value' => $this->options['additional_settings']['skip_blank_dates'],
+      '#default_value' => isset($this->options['additional_settings']['skip_blank_dates']) ? $this->options['additional_settings']['skip_blank_dates'] : 0,
     );
   }
 
@@ -111,6 +111,16 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
    * Returns an Event array row in the query with index: $row->index.
    */
   public function render($row) {
+    if (!isset($row->index)) {
+      // Edge case - wrong display plugin for this row plugin.
+      if ($this->view->live_preview) {
+        $plugin_title = $this->view->style_plugin->plugin_title();
+        backdrop_set_message(t('Row plugin "iCal Fields" is not compatible with %plugin_title.', array(
+          '%plugin_title' => $plugin_title,
+        )), 'error');
+      }
+      return;
+    }
     $date_field_name = $this->options['date_field'];
 
     // If this view is set to use the first populated date field, check each
@@ -134,11 +144,15 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       if ($date_field_name == 'first_available') {
         // If $date_field_name is still 'first_available' at this point, we
         // couldn't find an available Date value. Processing cannot proceed.
-        $title = strip_tags($this->view->style_plugin->get_field($row->index, $this->options['title_field']));
-        if (empty($title)) {
-          $title = "Undetermined title";
+        if (!empty($this->options['title_field'])) {
+          $title = strip_tags($this->view->style_plugin->get_field($row->index, $this->options['title_field']));
         }
-        throw new ViewsicalexportBlankDateFieldException(t("The row titled %title has no available Date value. An iCal entry cannot be created for it.", array('%title' => $title)));
+        else {
+          $title = 'Undetermined title';
+        }
+        throw new ViewsicalexportBlankDateFieldException(t('The row titled "@title" has no available Date value. An iCal entry cannot be created for it.', array(
+          '@title' => $title,
+        )));
       }
       $date = $this->getRowDate($row, $date_field_name);
     }
