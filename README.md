@@ -27,10 +27,11 @@ Set an appropriate path under "FEED SETTINGS", something like
 Attach that feed to your main Display - that will show the icon button below
 views results on that page/block.
 
-Note that if some of the date field's might be empty (an iCal event obviously
-needs a date), you should either filter empty field values out via views filter.
-Or if you're using multiple (different) date field types, and use the "First
+Note that if some of the date field's might be empty, you should either filter
+empty field values out via views filter.
+Or, if you're using multiple (different) date field types, and use the "First
 populated Date field" setting, you can "Skip blank dates" in the iCal Fields setting.
+An iCal event obviously needs a date.
 
 ## Dependencies
 
