@@ -11,13 +11,33 @@ to add your events to their calendar and get them updated automatically.
 
 ## Installation
 
-Install this module using the official Backdrop CMS instructions at https://backdropcms.org/guide/modules
+Install this module using the official [Backdrop CMS instructions](https://docs.backdropcms.org/documentation/extend-with-modules).
+
+Create or edit a view from a content type with date fields (could be core date,
+could be repeating dates).
+
+To attach an iCal feed to that view, click on "+ Add" next to the Displays
+buttons. Choose FEED. Switch the format (defaults to RSS):
+
+- Format: should be "iCal Feed"
+- Show: should be "iCal Fields"
+
+Set an appropriate path under "FEED SETTINGS", something like
+"path/your-event-feed.ics".
+Attach that feed to your main Display - that will show the icon button below
+views results on that page/block.
+
+Note that if some of the date field's might be empty (an iCal event obviously
+needs a date), you should either filter empty field values out via views filter.
+Or if you're using multiple (different) date field types, and use the "First
+populated Date field" setting, you can "Skip blank dates" in the iCal Fields setting.
 
 ## Dependencies
 
 No external dependencies.
 
-Two Backdrop modules are required, both come with Backdrop core:
+Two modules are required, both ship with Backdrop core and are
+typically enabled:
 
 * views
 * date
