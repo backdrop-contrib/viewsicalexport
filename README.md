@@ -27,6 +27,8 @@ Set an appropriate path under "FEED SETTINGS", something like
 Attach that feed to your main Display - that will show the icon button below
 views results on that page/block.
 
+![Admin UI section](https://raw.githubusercontent.com/backdrop-contrib/viewsicalexport/1.x-1.x/screenshots/screenshot-admin-ui.png)
+
 Note that if some of the date field's might be empty, you should either filter
 empty field values out via views filter.
 Or, if you're using multiple (different) date field types, and use the "First
