@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Documentation for the hooks provided by Views iCal Export.

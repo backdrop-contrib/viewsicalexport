@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Defines the Views iCal Export fields row style plugin.

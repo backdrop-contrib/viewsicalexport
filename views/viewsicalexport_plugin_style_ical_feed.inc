@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Views style plugin for the Views iCal Export module.

@@ -1,5 +1,4 @@
 <?php
-
 /**
  * @file
  * Declares our plugins to Views.
