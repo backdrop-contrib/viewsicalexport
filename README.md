@@ -28,7 +28,7 @@ views results on that page/block.
 
 ![Admin UI section](https://raw.githubusercontent.com/backdrop-contrib/viewsicalexport/1.x-1.x/screenshots/screenshot-admin-ui.png)
 
-Note that if some of the date field's might be empty, you should either filter
+Note that if some of the date fields might be empty, you should either filter
 empty field values out via views filter.
 Or, if you're using multiple (different) date field types, and use the "First
 populated Date field" setting, you can "Skip blank dates" in the iCal Fields setting.
