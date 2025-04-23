@@ -22,8 +22,7 @@ buttons. Choose FEED. Switch the format (defaults to RSS):
 - Format: should be "iCal Feed"
 - Show: should be "iCal Fields"
 
-Set an appropriate path under "FEED SETTINGS", something like
-"path/your-event-feed.ics".
+Set an appropriate path under "FEED SETTINGS".
 Attach that feed to your main Display - that will show the icon button below
 views results on that page/block.
 
