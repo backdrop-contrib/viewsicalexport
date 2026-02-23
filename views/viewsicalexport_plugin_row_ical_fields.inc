@@ -9,6 +9,8 @@
  */
 class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
 
+  protected $language;
+
   /**
    * Set up the options for the row plugin.
    */
@@ -28,7 +30,8 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
    */
   public function options_form(&$form, &$form_state) {
     parent::options_form($form, $form_state);
-    $all_field_labels = $this->display->handler->get_field_labels();
+    $display_handler = $this->view->display_handler;
+    $all_field_labels = $display_handler->get_field_labels();
     $date_field_labels = $this->getDateFieldCandidates($all_field_labels);
     $date_field_label_options = array_merge(array('first_available' => t('First populated Date field')), $date_field_labels);
     $text_field_label_options = array_merge(array('' => t('- None -')), $all_field_labels);
@@ -99,7 +102,8 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
    */
   public function pre_render($result) {
     // Get the language for this view.
-    $this->language = $this->display->handler->get_option('field_language');
+    $display_handler = $this->view->display_handler;
+    $this->language = $display_handler->get_option('field_language');
     $substitutions = views_views_query_substitutions($this->view);
     if (array_key_exists($this->language, $substitutions)) {
       $this->language = $substitutions[$this->language];
@@ -107,18 +111,18 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
   }
 
   /**
-   * Returns an Event array row in the query with index: $row->index.
+   * {@inheritdoc}
    */
   public function render($row) {
     if (!isset($row->index)) {
       // Edge case - wrong display plugin for this row plugin.
-      if ($this->view->live_preview) {
+      if (isset($this->view->live_preview)) {
         $plugin_title = $this->view->style_plugin->plugin_title();
         backdrop_set_message(t('Row plugin "iCal Fields" is not compatible with %plugin_title.', array(
           '%plugin_title' => $plugin_title,
         )), 'error');
       }
-      return;
+      return '';
     }
     $date_field_name = $this->options['date_field'];
 
@@ -159,7 +163,7 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       // Unless the user has specifically said that they want to skip rows
       // with blank dates, let this exception percolate.
       if ($this->options['additional_settings']['skip_blank_dates']) {
-        return NULL;
+        return '';
       }
       else {
         throw $e;
@@ -255,7 +259,85 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
     $event['location'] = $this->sanitizeText($text_fields['location'], $escape);
     $event['description'] = $this->sanitizeText($text_fields['description'], $escape);
 
-    return $event;
+    return $this->rowArrayToString($event);
+  }
+
+  /**
+   * @param array $event
+   *   Array of event properties.
+   *
+   * @return string
+   */
+  protected function rowArrayToString(array $event) {
+    $vevent = array();
+    $vevent[] = 'BEGIN:VEVENT';
+    $vevent[] = 'UID:' . $event['uid'];
+    $style_plugin = $this->view->style_plugin;
+    if (empty($style_plugin->options['exclude_dtstamp'])) {
+      $vevent[] = 'DTSTAMP:' . format_date(REQUEST_TIME, 'custom', 'Ymd\THis\Z', 'UTC');
+    }
+    $vevent[] = 'SUMMARY:' . $event['summary'];
+
+    if ($event['all_day']) {
+      // All Day events need to be DATEs, rather than DATE-TIMEs.
+      $vevent[] = 'DTSTART;VALUE=DATE:' . $this->dateObjectToString($event['start'], TRUE);
+    }
+    else {
+      $vevent[] = 'DTSTART:' . $this->dateObjectToString($event['start']);
+    }
+
+    // Only add the end date if there is one.
+    if (!empty($event['end'])) {
+      if ($event['all_day']) {
+        $vevent[] = 'DTEND;VALUE=DATE:' . $this->dateObjectToString($event['end'], TRUE);
+      }
+      else {
+        $vevent[] = 'DTEND:' . $this->dateObjectToString($event['end']);
+      }
+    }
+    if (!empty($event['location'])) {
+      $vevent[] = 'LOCATION:' . $event['location'];
+    }
+    if (!empty($event['description'])) {
+      $vevent[] = 'DESCRIPTION:' . $event['description'];
+    }
+    if (!empty($event['last-modified'])) {
+      $vevent[] = 'LAST-MODIFIED:' . $this->dateObjectToString($event['last-modified']);
+    }
+    if (!empty($event['created'])) {
+      $vevent[] = 'CREATED:' . $this->dateObjectToString($event['created']);
+    }
+    if (!empty($event['url'])) {
+      $vevent[] = wordwrap('ATTACH:' . $event['url'], 75, "\r\n ", TRUE);
+    }
+    $vevent[] = 'END:VEVENT';
+
+    // Allow other modules to alter the vevent before it's exported.
+    backdrop_alter('viewsicalexport_vevent', $vevent, $this->view);
+
+    return implode("\r\n", $vevent);
+  }
+
+  /**
+   * Helper function that creates date string from object.
+   *
+   * @param object $date
+   *   BackdropDateTime object.
+   * @param bool $date_only
+   *   Whether cardinality should be full or date only.
+   */
+  protected function dateObjectToString($date, $date_only = FALSE) {
+    $stamp = $date->format('U');
+    if ($date_only) {
+      $tz = $date->getTimezone();
+      // Use original timezone for date_only, as UTC would lead to
+      // unexpected results then.
+      $formatted = format_date($stamp, 'custom', 'Ymd', $tz->getName());
+    }
+    else {
+      $formatted = format_date($stamp, 'custom', 'Ymd\THis\Z', 'UTC');
+    }
+    return $formatted;
   }
 
   /**
@@ -354,7 +436,8 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
    *   An associative array like views_plugin_display::get_field_labels().
    */
   protected function getDateFieldCandidates(array $view_fields) {
-    $handlers = $this->display->handler->get_handlers('field');
+    $display_handler = $this->view->display_handler;
+    $handlers = $display_handler->get_handlers('field');
     $field_candidates = array();
     // These are Date, Date (ISO format), and Date (Unix timestamp).
     $date_fields = array('datetime', 'date', 'datestamp', 'repeating_date');
@@ -390,12 +473,17 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
   /**
    * Helper function to sanitize text fields.
    *
-   * @param string $text
+   * @param string|null $text
    *   Field value from views field.
    * @param bool $escape
    *   Whether to escape punctuation.
+   *
+   * @return string
    */
   protected function sanitizeText($text, $escape = TRUE) {
+    if (empty($text)) {
+      return '';
+    }
     $text = decode_entities($text);
     $text = strip_tags($text);
     if ($escape) {
