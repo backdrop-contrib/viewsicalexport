@@ -68,6 +68,7 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
       $variables = array(
         'url' => check_url($url),
         'tooltip' => $tooltip,
+        'type' => $this->getOption('icon_type'),
         'view' => $this->view,
       );
       $this->view->feed_icon .= theme('viewsicalexport_icon', $variables);
@@ -92,6 +93,7 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
     $options['disable_webcal'] = $false_bool;
     $options['exclude_dtstamp'] = $false_bool;
     $options['unescape_punctuation'] = $false_bool;
+    $options['icon_type'] = array('default' => 'png');
     return $options;
   }
 
@@ -140,6 +142,18 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
       '#description' => t('In order to comply with the iCal spec, Views iCal Export will "escape" commas and semicolons (prepend them with backslashes).
         However, many calendar clients are bugged to not unescape these characters, leaving the backslashes littered throughout your events.
         Enable this option to skip escaping.'),
+    );
+    $form['icon_type'] = array(
+      '#type' => 'select',
+      '#title' => t('Feed icon type'),
+      '#default_value' => $this->getOption('icon_type'),
+      '#options' => array(
+        'png' => t('PNG'),
+        'svg' => t('Inline SVG'),
+        'svg_fill' => t('Inline SVG filled (inverted)'),
+        'text' => t('Text only'),
+      ),
+      '#description' => t('When this feed is attached to another display, it renders a small subscribe icon in a link.'),
     );
   }
 
