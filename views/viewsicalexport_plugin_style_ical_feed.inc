@@ -173,7 +173,6 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
     }
 
     // Now add the VEVENTs.
-    $events = array();
     foreach ($this->view->result as $row_index => $row) {
       $this->view->row_index = $row_index;
       $row->index = $row_index;
