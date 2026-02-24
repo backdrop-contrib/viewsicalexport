@@ -206,7 +206,9 @@ class ViewsicalexportPluginRowIcalFields extends views_plugin_row {
       // is, make an educated guess about the delta by comparing this row's
       // start date to each of the entity's dates.
       $date_field_delta = 0;
-      if (isset($entity->{$date_field_name})) {
+      // Filter out node properties like 'created' or 'changed', which are no
+      // arrays.
+      if (isset($entity->{$date_field_name}) && is_array($entity->{$date_field_name})) {
         foreach ($entity->{$date_field_name}['und'] as $ndx => $date_array) {
           if ($date['start']->originalTime == $date_array['value']) {
             $date_field_delta = $ndx;

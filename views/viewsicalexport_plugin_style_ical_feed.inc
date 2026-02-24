@@ -178,7 +178,10 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
       $this->view->row_index = $row_index;
       $row->index = $row_index;
       try {
-        $vcalendar[] = $this->row_plugin->render($row);// @todo can this be empty?
+        $rendered = $this->row_plugin->render($row);
+        if (!empty($rendered)) {
+          $vcalendar[] = $rendered;
+        }
       }
       catch (Exception $e) {
         debug($e->getMessage(), NULL, TRUE);
