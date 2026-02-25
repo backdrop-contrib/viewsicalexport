@@ -1,0 +1,15 @@
+parameters:
+  level: 3
+  scanDirectories:
+    - ../../core
+  fileExtensions:
+    - php
+    - module
+    - inc
+    - install
+  excludePaths:
+    analyseAndScan:
+      - *.tpl.php
+      - *.api.php
+  universalObjectCratesClasses:
+    - view

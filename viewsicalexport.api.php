@@ -17,9 +17,9 @@
  *   - row
  *   - row_index
  *   - language
- *   - options
+ *   - options.
  */
-function hook_viewsicalexport_field_html_alter(&$text_fields, $view, $context) {
+function hook_viewsicalexport_field_html_alter(array &$text_fields, $view, array $context) {
 
 }
 
@@ -33,7 +33,7 @@ function hook_viewsicalexport_field_html_alter(&$text_fields, $view, $context) {
  * @param object $view
  *   The view object that is being executed to render the iCal feed.
  */
-function hook_viewsicalexport_vevent_alter(&$vevent, $view) {
+function hook_viewsicalexport_vevent_alter(array &$vevent, $view) {
 
 }
 
@@ -45,7 +45,7 @@ function hook_viewsicalexport_vevent_alter(&$vevent, $view) {
  * @param object $view
  *   The view object that is being executed to render the iCal feed.
  */
-function hook_viewsicalexport_vcalendar_alter(&$vcalendar, $view) {
+function hook_viewsicalexport_vcalendar_alter(array &$vcalendar, $view) {
 
 }
 
