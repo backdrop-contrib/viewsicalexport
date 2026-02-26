@@ -6,6 +6,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run PHP_CodeSniffer
-        uses: indigoxela/gha_composite/actions/phpcs_full@main
+        uses: indigoxela/gha_composite/actions/phpcs_full@v1
         with:
           fail_on_warnings: false
