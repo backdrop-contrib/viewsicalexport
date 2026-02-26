@@ -1,0 +1,9 @@
+name: Simpletest
+on: [pull_request]
+jobs:
+  functional_test:
+    timeout-minutes: 10
+    runs-on: ubuntu-latest
+    steps:
+      - name: Run Tests
+        uses: indigoxela/gha_composite/actions/simpletest@v1

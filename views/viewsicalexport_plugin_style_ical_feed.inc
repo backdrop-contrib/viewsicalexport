@@ -17,28 +17,6 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
   }
 
   /**
-   * Helper function that creates date string from object.
-   *
-   * @param object $date
-   *   BackdropDateTime object.
-   * @param bool $date_only
-   *   Whether cardinality should be full or date only.
-   */
-  protected function dateObjectToString($date, $date_only = FALSE) {
-    $stamp = $date->format('U');
-    if ($date_only) {
-      $tz = $date->getTimezone();
-      // Use original timezone for date_only, as UTC would lead to
-      // unexpected results then.
-      $formatted = format_date($stamp, 'custom', 'Ymd', $tz->getName());
-    }
-    else {
-      $formatted = format_date($stamp, 'custom', 'Ymd\THis\Z', 'UTC');
-    }
-    return $formatted;
-  }
-
-  /**
    * Sets up the iCal feed icon on pages.
    */
   public function attach_to($display_id, $path, $title) {
@@ -171,19 +149,6 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
       // resulted was totally non-sensical, so I'm adding this just in case.
       return t("When using the iCal Fields row plugin, the Date field is required. Please set it up using the Settings link under 'Format -> Show: iCal Fields'.");
     }
-    $events = array();
-    foreach ($this->view->result as $row_index => $row) {
-      $this->view->row_index = $row_index;
-      $row->index = $row_index;
-      try {
-        $events[] = $this->row_plugin->render($row);
-      }
-      catch (Exception $e) {
-        debug($e->getMessage(), NULL, TRUE);
-        return $e->getMessage();
-      }
-    }
-    unset($this->view->row_index);
 
     $vcalendar = array();
     $dtstamp = format_date(REQUEST_TIME, 'custom', 'Ymd\THis\Z', 'UTC');
@@ -208,59 +173,21 @@ class ViewsicalexportPluginStyleIcalFeed extends views_plugin_style {
     }
 
     // Now add the VEVENTs.
-    foreach ($events as $event) {
-      $vevent = array();
-      if (empty($event)) {
-        // The row plugin returned NULL for this row.
-        // When this happens, just skip it.
-        continue;
-      }
-
-      $vevent[] = 'BEGIN:VEVENT';
-      $vevent[] = 'UID:' . $event['uid'];
-      if (!$this->getOption('exclude_dtstamp')) {
-        $vevent[] = 'DTSTAMP:' . $dtstamp;
-      }
-      $vevent[] = 'SUMMARY:' . $event['summary'];
-
-      if ($event['all_day']) {
-        // All Day events need to be DATEs, rather than DATE-TIMEs.
-        $vevent[] = 'DTSTART;VALUE=DATE:' . $this->dateObjectToString($event['start'], TRUE);
-      }
-      else {
-        $vevent[] = 'DTSTART:' . $this->dateObjectToString($event['start']);
-      }
-
-      // Only add the end date if there is one.
-      if (!empty($event['end'])) {
-        if ($event['all_day']) {
-          $vevent[] = 'DTEND;VALUE=DATE:' . $this->dateObjectToString($event['end'], TRUE);
-        }
-        else {
-          $vevent[] = 'DTEND:' . $this->dateObjectToString($event['end']);
+    foreach ($this->view->result as $row_index => $row) {
+      $this->view->row_index = $row_index;
+      $row->index = $row_index;
+      try {
+        $rendered = $this->row_plugin->render($row);
+        if (!empty($rendered)) {
+          $vcalendar[] = $rendered;
         }
       }
-      if (!empty($event['location'])) {
-        $vevent[] = 'LOCATION:' . $event['location'];
+      catch (Exception $e) {
+        debug($e->getMessage(), NULL, TRUE);
+        return $e->getMessage();
       }
-      if (!empty($event['description'])) {
-        $vevent[] = 'DESCRIPTION:' . $event['description'];
-      }
-      if (!empty($event['last-modified'])) {
-        $vevent[] = 'LAST-MODIFIED:' . $this->dateObjectToString($event['last-modified']);
-      }
-      if (!empty($event['created'])) {
-        $vevent[] = 'CREATED:' . $this->dateObjectToString($event['created']);
-      }
-      if (!empty($event['url'])) {
-        $vevent[] = wordwrap('ATTACH:' . $event['url'], 75, "\r\n ", TRUE);
-      }
-      $vevent[] = 'END:VEVENT';
-
-      // Allow other modules to alter the vevent before it's exported.
-      backdrop_alter('viewsicalexport_vevent', $vevent, $this->view);
-      $vcalendar[] = implode("\r\n", $vevent);
     }
+    unset($this->view->row_index);
 
     $vcalendar[] = 'END:VCALENDAR';
 
