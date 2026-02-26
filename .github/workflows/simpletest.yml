@@ -6,4 +6,4 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Run Tests
-        uses: indigoxela/gha_composite/actions/simpletest@main
+        uses: indigoxela/gha_composite/actions/simpletest@v1
